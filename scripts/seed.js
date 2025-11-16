@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 const RequestType = require('../src/models/RequestType');
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
 require('dotenv').config();
 
 (async () => {
   try {
     console.log(' Seeding database...');
 
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(uri);
 
     await RequestType.deleteMany();
 
