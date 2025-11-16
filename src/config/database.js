@@ -27,5 +27,5 @@ const connectDB = async () => {
   }
 };
 
-feature/ci-cd-setup
+
 module.exports = connectDB;

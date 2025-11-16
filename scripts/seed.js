@@ -1,39 +1,24 @@
+const mongoose = require('mongoose');
+const RequestType = require('../src/models/RequestType');
+require('dotenv').config();
 
-app.use((err, req, res, next) => {
-  if (process.env.NODE_ENV !== 'test') {
-    console.error('Error:', err.stack);
+(async () => {
+  try {
+    console.log(' Seeding database...');
+
+    await mongoose.connect(process.env.MONGO_URI);
+
+    await RequestType.deleteMany();
+
+    await RequestType.insertMany([
+      { code: 'BUG', label: 'Bug Technique', description: 'Problème technique' },
+      { code: 'REQ', label: 'Requête', description: 'Demande générale' }
+    ]);
+
+    console.log('✔ Seed completed');
+    process.exit(0);
+  } catch (err) {
+    console.error(' Seed failed:', err);
+    process.exit(1);
   }
-
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Erreur interne du serveur',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
-
-
-const server = app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
-  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(` Health check: http://localhost:${PORT}/health`);
-  console.log(` API endpoints: http://localhost:${PORT}/api/request-types`);
-});
-
-
-process.on('SIGTERM', () => {
-  console.log('SIGTERM reçu, arrêt gracieux...');
-  server.close(() => {
-    console.log('Serveur fermé');
-    process.exit(0);
-  });
-});
-
-process.on('SIGINT', () => {
-  console.log('SIGINT reçu, arrêt gracieux...');
-  server.close(() => {
-    console.log('Serveur fermé');
-    process.exit(0);
-  });
-});
-
-module.exports = app;
+})();
