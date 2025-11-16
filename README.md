@@ -3,6 +3,7 @@
 [![CI/CD Pipeline](https://github.com/VOTRE_USERNAME/support-api/actions/workflows/ci.yml/badge.svg)](https://github.com/VOTRE_USERNAME/support-api/actions/workflows/ci.yml)
 
 ## Table des matières
+
 - [Workflow Git](#workflow-git)
 - [CI/CD](#cicd)
 - [Installation et utilisation](#installation-et-utilisation)
@@ -11,6 +12,7 @@
 ## Workflow Git
 
 ### Schéma du workflow
+
 ```
 main (protégée) ← Pull Request ← feature/nom-feature
      ↓
@@ -20,6 +22,7 @@ main (protégée) ← Pull Request ← feature/nom-feature
 ```
 
 ### Règles de protection configurées
+
 ![Protection de branche - Settings](screen/config-github-rule-2.png)
 ![Required Status Checks](screen/config-github-rule.png)
 
@@ -29,6 +32,7 @@ main (protégée) ← Pull Request ← feature/nom-feature
 - ✅ **Branches à jour avant merge**
 
 ### Comment créer une Pull Request
+
 1. Créer une branche : `git checkout -b feature/nom-feature`
 2. Développer avec commits conventionnels
 3. Push : `git push -u origin feature/nom-feature`
@@ -43,36 +47,41 @@ main (protégée) ← Pull Request ← feature/nom-feature
 ### Jobs configurés
 
 #### 🔍 `code-quality`
+
 - **ESLint** : Vérification des standards de code
 - **Prettier** : Vérification du formatage
 - **Rôle** : Garantir la qualité et la cohérence du code
 
-#### 🧪 `tests`  
+#### 🧪 `tests`
+
 - **Tests unitaires** : Jest + Supertest
 - **Coverage** : Minimum 70%
 - **Base de données** : MongoDB en service
 - **Rôle** : Garantir le bon fonctionnement
 
 ### Required checks
+
 - `code-quality` : Bloque si standards non respectés
 - `tests` : Bloque si tests échouent ou coverage < 70%
 
 ## Installation et utilisation
 
 ### Prérequis
+
 - Node.js 18+
 - MongoDB 6.0+
 - npm
 
 ### Installation
+
 ```bash
 git clone https://github.com/VOTRE_USERNAME/support-api.git
 cd support-api
 npm install
 ```
 
-
 ### Commandes disponibles
+
 ```bash
 npm start           # Démarrer le serveur
 npm run dev         # Mode développement avec nodemon
@@ -86,23 +95,26 @@ npm run format      # Formatter avec Prettier
 ### Exemples d'appels API
 
 #### Santé du serveur
+
 ```bash
 GET /health
 Response: {"status":"ok","timestamp":"2024-01-01T00:00:00.000Z"}
 ```
 
 #### Lister les types de requêtes
+
 ```bash
 GET /api/request-types
 Response: {"success":true,"data":[...],"count":5}
 ```
 
 #### Créer un type de requête
+
 ```bash
 POST /api/request-types
 Body: {
   "code": "BUG_REPORT",
-  "name": "Bug Report", 
+  "name": "Bug Report",
   "description": "Signaler un bug",
   "category": "Technique",
   "estimatedResponseTime": 24
@@ -139,6 +151,7 @@ suppport-api/
 ```
 
 ### Rôle de chaque dossier
+
 - **src/** : Code source de l'application
 - **tests/** : Tests unitaires et d'intégration
 - **scripts/** : Scripts utilitaires

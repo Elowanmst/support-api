@@ -22,7 +22,10 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -42,7 +45,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
@@ -50,7 +53,7 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.status(200).json({
     message: 'Support API - Système de Support Client',
-    version: '1.0.0'
+    version: '1.0.0',
   });
 });
 
@@ -58,19 +61,19 @@ app.get('/', (req, res) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route non trouvée'
+    message: 'Route non trouvée',
   });
 });
 
 // Middleware global d'erreurs
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   if (process.env.NODE_ENV !== 'test') {
     console.error('Error:', err.stack);
   }
 
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Erreur interne du serveur'
+    message: err.message || 'Erreur interne du serveur',
   });
 });
 

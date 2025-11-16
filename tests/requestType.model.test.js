@@ -3,7 +3,8 @@ const RequestType = require('../src/models/RequestType');
 
 describe('RequestType Model', () => {
   beforeAll(async () => {
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/test_support_api';
+    const MONGODB_URI =
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/test_support_api';
     await mongoose.connect(MONGODB_URI);
   });
 
@@ -21,7 +22,7 @@ describe('RequestType Model', () => {
       name: 'Test Model',
       description: 'Test model description',
       category: 'Testing',
-      estimatedResponseTime: 12
+      estimatedResponseTime: 12,
     };
 
     const requestType = new RequestType(requestTypeData);
@@ -38,7 +39,7 @@ describe('RequestType Model', () => {
 
   test('should fail without required fields', async () => {
     const requestType = new RequestType({
-      name: 'Missing Required Fields'
+      name: 'Missing Required Fields',
       // Manque code, description, category, estimatedResponseTime
     });
 
@@ -63,7 +64,7 @@ describe('RequestType Model', () => {
       description: 'Test invalid priority',
       category: 'Test',
       estimatedResponseTime: 24,
-      priority: 'invalid_priority'
+      priority: 'invalid_priority',
     });
 
     let error;
@@ -85,7 +86,7 @@ describe('RequestType Model', () => {
         description: 'Active type 1',
         category: 'Test',
         estimatedResponseTime: 24,
-        isActive: true
+        isActive: true,
       },
       {
         code: 'ACTIVE_2',
@@ -93,7 +94,7 @@ describe('RequestType Model', () => {
         description: 'Active type 2',
         category: 'Test',
         estimatedResponseTime: 24,
-        isActive: true
+        isActive: true,
       },
       {
         code: 'INACTIVE_1',
@@ -101,12 +102,12 @@ describe('RequestType Model', () => {
         description: 'Inactive type 1',
         category: 'Test',
         estimatedResponseTime: 24,
-        isActive: false
-      }
+        isActive: false,
+      },
     ]);
 
     const activeTypes = await RequestType.findActive();
     expect(activeTypes).toHaveLength(2);
-    expect(activeTypes.every(type => type.isActive)).toBe(true);
+    expect(activeTypes.every((type) => type.isActive)).toBe(true);
   });
 });

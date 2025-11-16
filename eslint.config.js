@@ -21,15 +21,15 @@ module.exports = [
         beforeAll: 'readonly',
         afterAll: 'readonly',
         beforeEach: 'readonly',
-        afterEach: 'readonly'
-      }
+        afterEach: 'readonly',
+      },
     },
     rules: {
       'no-console': 'off',
       'no-unused-vars': 'warn',
       'no-undef': 'error',
-      'semi': ['error', 'always'],
-      'quotes': ['error', 'single']
-    }
-  }
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+    },
+  },
 ];

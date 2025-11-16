@@ -6,7 +6,8 @@ const RequestType = require('../src/models/RequestType');
 describe('Support API Tests', () => {
   beforeAll(async () => {
     // Connexion à la base de test
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/test_support_api';
+    const MONGODB_URI =
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/test_support_api';
     await mongoose.connect(MONGODB_URI);
   });
 
@@ -22,9 +23,7 @@ describe('Support API Tests', () => {
 
   describe('GET /health', () => {
     test('should return status 200', async () => {
-      const response = await request(app)
-        .get('/health')
-        .expect(200);
+      const response = await request(app).get('/health').expect(200);
 
       expect(response.body).toHaveProperty('status', 'ok');
     });
@@ -32,18 +31,14 @@ describe('Support API Tests', () => {
 
   describe('GET /api/request-types', () => {
     test('should return an array', async () => {
-      const response = await request(app)
-        .get('/api/request-types')
-        .expect(200);
+      const response = await request(app).get('/api/request-types').expect(200);
 
       expect(response.body).toHaveProperty('success', true);
       expect(Array.isArray(response.body.data)).toBe(true);
     });
 
     test('should return empty array when no data', async () => {
-      const response = await request(app)
-        .get('/api/request-types')
-        .expect(200);
+      const response = await request(app).get('/api/request-types').expect(200);
 
       expect(response.body.data).toEqual([]);
       expect(response.body.count).toBe(0);
@@ -58,7 +53,7 @@ describe('Support API Tests', () => {
           description: 'This is active',
           category: 'Test',
           estimatedResponseTime: 24,
-          isActive: true
+          isActive: true,
         },
         {
           code: 'INACTIVE_TYPE',
@@ -66,13 +61,11 @@ describe('Support API Tests', () => {
           description: 'This is inactive',
           category: 'Test',
           estimatedResponseTime: 24,
-          isActive: false
-        }
+          isActive: false,
+        },
       ]);
 
-      const response = await request(app)
-        .get('/api/request-types')
-        .expect(200);
+      const response = await request(app).get('/api/request-types').expect(200);
 
       expect(response.body.data).toHaveLength(1);
       expect(response.body.data[0].code).toBe('ACTIVE_TYPE');
@@ -87,7 +80,7 @@ describe('Support API Tests', () => {
         description: 'This is a new type',
         category: 'Test',
         estimatedResponseTime: 48,
-        priority: 'high'
+        priority: 'high',
       };
 
       const response = await request(app)
@@ -104,7 +97,7 @@ describe('Support API Tests', () => {
 
     test('should fail with missing required fields', async () => {
       const invalidRequestType = {
-        name: 'Missing Code'
+        name: 'Missing Code',
         // Manque code, description, category, estimatedResponseTime
       };
 
@@ -124,7 +117,7 @@ describe('Support API Tests', () => {
         name: 'Original Type',
         description: 'Original description',
         category: 'Test',
-        estimatedResponseTime: 24
+        estimatedResponseTime: 24,
       });
 
       // Essayer de créer un type avec le même code
@@ -133,7 +126,7 @@ describe('Support API Tests', () => {
         name: 'Duplicate Type',
         description: 'Duplicate description',
         category: 'Test',
-        estimatedResponseTime: 24
+        estimatedResponseTime: 24,
       };
 
       const response = await request(app)
@@ -153,7 +146,7 @@ describe('Support API Tests', () => {
         name: 'Specific Type',
         description: 'Specific description',
         category: 'Test',
-        estimatedResponseTime: 24
+        estimatedResponseTime: 24,
       });
 
       const response = await request(app)
@@ -166,7 +159,7 @@ describe('Support API Tests', () => {
 
     test('should return 404 for non-existent id', async () => {
       const fakeId = new mongoose.Types.ObjectId();
-      
+
       const response = await request(app)
         .get(`/api/request-types/${fakeId}`)
         .expect(404);

@@ -11,8 +11,12 @@ require('dotenv').config();
     await RequestType.deleteMany();
 
     await RequestType.insertMany([
-      { code: 'BUG', label: 'Bug Technique', description: 'Problème technique' },
-      { code: 'REQ', label: 'Requête', description: 'Demande générale' }
+      {
+        code: 'BUG',
+        label: 'Bug Technique',
+        description: 'Problème technique',
+      },
+      { code: 'REQ', label: 'Requête', description: 'Demande générale' },
     ]);
 
     console.log('✔ Seed completed');
