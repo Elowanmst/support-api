@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 
 
 
+// Middleware de logging (désactivé en mode test)
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -36,9 +37,10 @@ app.use((req, res, next) => {
   next();
 });
 
-
-// Connexion à la base de données
-connectDB();
+// Connexion à la base de données (seulement si pas en mode test)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 
 // Routes
@@ -76,13 +78,9 @@ app.use('*', (req, res) => {
 
 // Middleware global de gestion d'erreurs
 app.use((err, req, res, next) => {
-
-feature/ci-cd-setup
   if (process.env.NODE_ENV !== 'test') {
     console.error('Error:', err.stack);
   }
-
-
   
   res.status(err.status || 500).json({
     success: false,
@@ -91,16 +89,14 @@ feature/ci-cd-setup
   });
 });
 
-
-
-// Démarrage du serveur
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-  console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
-});
-
+// Démarrage du serveur (seulement si pas en mode test)
+if (process.env.NODE_ENV !== 'test') {
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
+  });
 
   // Gestion de l'arrêt gracieux
   process.on('SIGTERM', () => {

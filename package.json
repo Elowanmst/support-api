@@ -9,8 +9,8 @@
     "test": "jest --coverage",
     "test:coverage": "jest --coverage",
     "seed": "node scripts/seed.js",
-    "lint": "eslint src/**/*.js",
-    "lint:fix": "eslint src/**/*.js --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format:check": "prettier --check \"src/**/*.js\"",
     "format": "prettier --write \"src/**/*.js\""
   },
