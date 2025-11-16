@@ -6,7 +6,8 @@ require('dotenv').config();
   try {
     console.log('Seeding database...');
 
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
+    const uri =
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
     await mongoose.connect(uri);
 
     await RequestType.deleteMany();
@@ -19,7 +20,7 @@ require('dotenv').config();
         category: 'Incident',
         priority: 'high',
         estimatedResponseTime: 24,
-        isActive: true
+        isActive: true,
       },
       {
         code: 'REQ',
@@ -28,13 +29,12 @@ require('dotenv').config();
         category: 'Service',
         priority: 'medium',
         estimatedResponseTime: 48,
-        isActive: true
-      }
+        isActive: true,
+      },
     ]);
 
     console.log('✔ Seed completed');
     process.exit(0);
-
   } catch (err) {
     console.error(' Seed failed:', err);
     process.exit(1);
