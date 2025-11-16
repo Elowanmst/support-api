@@ -6,12 +6,13 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest",
+    "test": "jest --coverage",
     "test:coverage": "jest --coverage",
-    "lint": "eslint src/ scripts/ tests/ --ext .js",
-    "lint:fix": "eslint src/ scripts/ tests/ --ext .js --fix",
-    "format": "prettier --write \"**/*.{js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{js,json,md}\""
+    "seed": "node scripts/seed.js",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "format:check": "prettier --check \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.js\""
   },
   "dependencies": {
     "dotenv": "^17.2.3",
