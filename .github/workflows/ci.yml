@@ -21,18 +21,46 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    
     - name: Install dependencies
       run: npm ci
     
     - name: Run ESLint
-      run: npx eslint src/ scripts/ tests/ --ext .js
+      run: |
+        npx eslint src/ scripts/ tests/ --ext .js
+        if [ $? -ne 0 ]; then
+          echo "ESLint errors found - build failed"
+          exit 1
+        fi
     
     - name: Run Prettier check
-      run: npx prettier --check "**/*.{js,json,md}"
+      run: |
+        npx prettier --check "**/*.{js,json,md}"
+        if [ $? -ne 0 ]; then
+          echo "Prettier formatting errors found - build failed"
+          exit 1
+        fi
 
   tests:
     runs-on: ubuntu-latest
     name: Tests
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+    
+    env:
+      MONGODB_URI: mongodb://localhost:27017/test_support_api
+      NODE_ENV: test
     
     steps:
     - name: Checkout code
@@ -44,12 +72,43 @@ jobs:
         node-version: '18'
         cache: 'npm'
     
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    
     - name: Install dependencies
       run: npm ci
     
-    - name: Run tests
-      run: npm test
+    - name: Wait for MongoDB to be ready
+      run: |
+        until nc -z localhost 27017; do
+          echo "Waiting for MongoDB..."
+          sleep 2
+        done
+        echo "MongoDB is ready!"
     
-    - name: Generate test coverage
+    - name: Initialize database with seed script
+      run: npm run seed
+    
+    - name: Run tests with coverage
       run: npm run test:coverage
-      continue-on-error: true
+    
+    - name: Check coverage threshold
+      run: |
+        COVERAGE=$(npm run test:coverage -- --silent | grep -o 'All files[^|]*|[^|]*|[^|]*|[^|]*|[^|]*' | awk -F'|' '{print $2}' | tr -d ' %')
+        if [ "$COVERAGE" -lt 70 ]; then
+          echo "Coverage $COVERAGE% is below 70% threshold"
+          exit 1
+        fi
+        echo "Coverage $COVERAGE% meets the 70% threshold"
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
