@@ -1,103 +1,145 @@
 # Support API - Système de Support Client
 
-## Description
-API REST pour un système de support client utilisant Node.js, Express et MongoDB.
+[![CI/CD Pipeline](https://github.com/VOTRE_USERNAME/support-api/actions/workflows/ci.yml/badge.svg)](https://github.com/VOTRE_USERNAME/support-api/actions/workflows/ci.yml)
 
 ## Table des matières
-- [Installation](#installation)
-- [Configuration Git et GitHub](#configuration-git-et-github)
-- [Workflow de développement](#workflow-de-développement)
-- [API Documentation](#api-documentation)
-- [Tests](#tests)
+- [Workflow Git](#workflow-git)
+- [CI/CD](#cicd)
+- [Installation et utilisation](#installation-et-utilisation)
+- [Structure du projet](#structure-du-projet)
 
-## Installation
+## Workflow Git
 
-```bash
-npm install
-npm start
+### Schéma du workflow
+```
+main (protégée) ← Pull Request ← feature/nom-feature
+     ↓
+  Validation automatique (CI/CD)
+     ↓
+  Merge après review
 ```
 
-## Configuration Git et GitHub
-
-### Protection de la branche `main`
-
-#### Règles de protection appliquées
-
+### Règles de protection configurées
+![Protection de branche - Settings](screen/config-github-rule-2.png)
 ![Required Status Checks](screen/config-github-rule.png)
 
-![Protection de branche - Settings](screen/config-github-rule-2.png)
-
-
-#### Règles configurées :
 - ❌ **Pas de push direct sur main**
-- ✅ **Pull Request obligatoire avant merge**
-- ✅ **Status checks obligatoires** :
-  - `code-quality` (ESLint + Prettier)
-  - `tests` (Tests unitaires + coverage)
-- ✅ **Branches à jour obligatoire avant merge**
+- ✅ **Pull Request obligatoire**
+- ✅ **Status checks obligatoires** : `code-quality`, `tests`
+- ✅ **Branches à jour avant merge**
 
-#### Pourquoi ces règles sont importantes :
+### Comment créer une Pull Request
+1. Créer une branche : `git checkout -b feature/nom-feature`
+2. Développer avec commits conventionnels
+3. Push : `git push -u origin feature/nom-feature`
+4. Créer la PR sur GitHub
+5. Attendre validation CI/CD ✅
+6. Merger et supprimer la branche
 
-**1. Protection contre les erreurs humaines**
-- Évite les commits accidentels sur la branche principale
-- Force la revue de code via Pull Requests
-- Réduit les risques de régression
+## CI/CD
 
-**2. Qualité du code garantie**
-- `code-quality` : Assure le respect des standards ESLint/Prettier
-- `tests` : Vérifie que toutes les fonctionnalités marchent
-- Empêche l'intégration de code défaillant
+[![CI/CD Status](https://github.com/VOTRE_USERNAME/support-api/actions/workflows/ci.yml/badge.svg)](https://github.com/VOTRE_USERNAME/support-api/actions/workflows/ci.yml)
 
-**3. Collaboration efficace**
-- Historique Git propre et traçable
-- Discussions sur les changements via PR
-- Documentation automatique des modifications
+### Jobs configurés
 
-**4. Intégration continue**
-- Validation automatique avant chaque merge
-- Détection précoce des problèmes
-- Déploiement sécurisé
+#### 🔍 `code-quality`
+- **ESLint** : Vérification des standards de code
+- **Prettier** : Vérification du formatage
+- **Rôle** : Garantir la qualité et la cohérence du code
 
-## Workflow de développement
+#### 🧪 `tests`  
+- **Tests unitaires** : Jest + Supertest
+- **Coverage** : Minimum 70%
+- **Base de données** : MongoDB en service
+- **Rôle** : Garantir le bon fonctionnement
 
-### Étapes du workflow :
+### Required checks
+- `code-quality` : Bloque si standards non respectés
+- `tests` : Bloque si tests échouent ou coverage < 70%
 
-1. **Créer une branche feature**
-   ```bash
-   git checkout -b feature/nom-de-la-feature
-   ```
+## Installation et utilisation
 
-2. **Développement avec commits structurés**
-   ```bash
-   git commit -m "feat: description de la fonctionnalité"
-   ```
+### Prérequis
+- Node.js 18+
+- MongoDB 6.0+
+- npm
 
-3. **Push et création de PR**
-   ```bash
-   git push -u origin feature/nom-de-la-feature
-   ```
-
-4. **Validation automatique**
-   - Checks CI/CD s'exécutent automatiquement
-   - Merge possible uniquement si tous les checks ✅
-
-5. **Merge et nettoyage**
-   - Merge via GitHub (pas de push direct)
-   - Suppression automatique de la branche
-
-## Pull Requests réalisées
-
-- [x] **PR #1** : Configuration initiale (ESLint, Prettier, CI/CD)
-- [x] **PR #2** : Modèle RequestType et routes MongoDB  
-- [x] **PR #3** : Tests unitaires et documentation finale
-
-## API Documentation
-
-[À compléter avec les endpoints de votre API]
-
-## Tests
-
+### Installation
 ```bash
-npm test              # Lancer les tests
-npm run test:coverage # Coverage des tests
+git clone https://github.com/VOTRE_USERNAME/support-api.git
+cd support-api
+npm install
 ```
+
+
+### Commandes disponibles
+```bash
+npm start           # Démarrer le serveur
+npm run dev         # Mode développement avec nodemon
+npm test            # Lancer les tests
+npm run test:coverage # Tests avec coverage
+npm run seed        # Peupler la base de données
+npm run lint        # Vérifier ESLint
+npm run format      # Formatter avec Prettier
+```
+
+### Exemples d'appels API
+
+#### Santé du serveur
+```bash
+GET /health
+Response: {"status":"ok","timestamp":"2024-01-01T00:00:00.000Z"}
+```
+
+#### Lister les types de requêtes
+```bash
+GET /api/request-types
+Response: {"success":true,"data":[...],"count":5}
+```
+
+#### Créer un type de requête
+```bash
+POST /api/request-types
+Body: {
+  "code": "BUG_REPORT",
+  "name": "Bug Report", 
+  "description": "Signaler un bug",
+  "category": "Technique",
+  "estimatedResponseTime": 24
+}
+```
+
+## Structure du projet
+
+```
+suppport-api/
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml              # Pipeline CI/CD
+│   └── pull_request_template.md # Template PR
+├── src/
+│   ├── config/
+│   │   └── database.js         # Configuration MongoDB
+│   ├── models/
+│   │   └── RequestType.js      # Modèle Mongoose
+│   ├── routes/
+│   │   └── requestTypes.js     # Routes CRUD
+│   └── server.js               # Serveur Express principal
+├── tests/
+│   ├── setup.js                # Configuration Jest
+│   ├── requestType.model.test.js # Tests modèle
+│   └── requestTypes.test.js    # Tests routes API
+├── scripts/
+│   └── seed.js                 # Script de peuplement
+├── screen/                     # Captures GitHub
+├── .eslintrc.js               # Configuration ESLint
+├── .prettierrc                # Configuration Prettier
+├── jest.config.json           # Configuration tests
+└── package.json               # Dépendances et scripts
+```
+
+### Rôle de chaque dossier
+- **src/** : Code source de l'application
+- **tests/** : Tests unitaires et d'intégration
+- **scripts/** : Scripts utilitaires
+- **.github/** : Configuration GitHub Actions et templates

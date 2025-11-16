@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 const RequestType = require('../src/models/RequestType');
-
-// Configuration de la base de données
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
 
 const seedData = [
   {
@@ -55,7 +53,8 @@ const seedData = [
 async function seedDatabase() {
   try {
     console.log('🔌 Connexion à MongoDB...');
-    await mongoose.connect(MONGODB_URI);
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
+    await mongoose.connect(mongoURI);
     console.log('✅ Connexion réussie à MongoDB');
 
     console.log('🗑️  Suppression des données existantes...');
