@@ -34,7 +34,7 @@ jobs:
     
     - name: Run ESLint
       run: |
-        npx eslint src/ scripts/ tests/ --ext .js
+        npx eslint .
         if [ $? -ne 0 ]; then
           echo "ESLint errors found - build failed"
           exit 1
