@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const RequestType = require('../src/models/RequestType');
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
 require('dotenv').config();
 
 (async () => {
   try {
-    console.log(' Seeding database...');
+    console.log('Seeding database...');
 
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
     await mongoose.connect(uri);
 
     await RequestType.deleteMany();
@@ -14,14 +14,27 @@ require('dotenv').config();
     await RequestType.insertMany([
       {
         code: 'BUG',
-        label: 'Bug Technique',
+        name: 'Bug Technique',
         description: 'Problème technique',
+        category: 'Incident',
+        priority: 'high',
+        estimatedResponseTime: 24,
+        isActive: true
       },
-      { code: 'REQ', label: 'Requête', description: 'Demande générale' },
+      {
+        code: 'REQ',
+        name: 'Requête',
+        description: 'Demande générale',
+        category: 'Service',
+        priority: 'medium',
+        estimatedResponseTime: 48,
+        isActive: true
+      }
     ]);
 
     console.log('✔ Seed completed');
     process.exit(0);
+
   } catch (err) {
     console.error(' Seed failed:', err);
     process.exit(1);
