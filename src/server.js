@@ -11,7 +11,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// CORS middleware (pour les requêtes cross-origin si nécessaire)
+
+
+// CORS middleware
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -27,15 +29,17 @@ app.use((req, res, next) => {
 
 
 
-// Middleware de logging des requêtes
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  }
   next();
 });
 
+
 // Connexion à la base de données
 connectDB();
-main
+
 
 // Routes
 app.use('/api/request-types', requestTypesRoutes);
@@ -72,10 +76,12 @@ app.use('*', (req, res) => {
 
 // Middleware global de gestion d'erreurs
 app.use((err, req, res, next) => {
+
 feature/ci-cd-setup
   if (process.env.NODE_ENV !== 'test') {
     console.error('Error:', err.stack);
   }
+
 
   
   res.status(err.status || 500).json({
@@ -86,6 +92,7 @@ feature/ci-cd-setup
 });
 
 
+
 // Démarrage du serveur
 const server = app.listen(PORT, () => {
   console.log(`🚀 Serveur démarré sur le port ${PORT}`);
@@ -94,22 +101,24 @@ const server = app.listen(PORT, () => {
   console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
 });
 
-// Gestion de l'arrêt gracieux
-process.on('SIGTERM', () => {
-  console.log('SIGTERM reçu, arrêt gracieux...');
-  server.close(() => {
-    console.log('Serveur fermé');
-    process.exit(0);
-  });
-});
 
-process.on('SIGINT', () => {
-  console.log('SIGINT reçu, arrêt gracieux...');
-  server.close(() => {
-    console.log('Serveur fermé');
-    process.exit(0);
+  // Gestion de l'arrêt gracieux
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM reçu, arrêt gracieux...');
+    server.close(() => {
+      console.log('Serveur fermé');
+      process.exit(0);
+    });
   });
-});
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT reçu, arrêt gracieux...');
+    server.close(() => {
+      console.log('Serveur fermé');
+      process.exit(0);
+    });
+  });
+}
 
 
 module.exports = app;

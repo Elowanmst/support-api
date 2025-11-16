@@ -1,25 +1,21 @@
 const express = require('express');
 
-const RequestType = require('../models/RequestType');
-
 const router = express.Router();
+const RequestType = require('../models/RequestType');
 
 // GET /api/request-types - Liste tous les types actifs
 router.get('/', async (req, res) => {
   try {
-    const requestTypes = await RequestType.findActive();
-    
-    res.status(200).json({
+    const requestTypes = await RequestType.find({ isActive: true });
+    res.json({
       success: true,
-      count: requestTypes.length,
-      data: requestTypes
+      data: requestTypes,
+      count: requestTypes.length
     });
   } catch (error) {
-    console.error('Error fetching request types:', error);
-    res.status(500).json({
+    res.status(500).json({ 
       success: false,
-      message: 'Erreur lors de la récupération des types de demande',
-      error: error.message
+      message: error.message 
     });
   }
 });
@@ -27,27 +23,23 @@ router.get('/', async (req, res) => {
 // GET /api/request-types/:id - Récupère un type par ID
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    const requestType = await RequestType.findById(id);
+    const requestType = await RequestType.findById(req.params.id);
     
     if (!requestType) {
-      return res.status(404).json({
+      return res.status(404).json({ 
         success: false,
-        message: 'Type de demande non trouvé'
+        message: 'Type de demande non trouvé' 
       });
     }
     
-    res.status(200).json({
+    res.json({
       success: true,
       data: requestType
     });
   } catch (error) {
-    console.error('Error fetching request type:', error);
-    res.status(500).json({
+    res.status(500).json({ 
       success: false,
-      message: 'Erreur lors de la récupération du type de demande',
-      error: error.message
+      message: error.message 
     });
   }
 });
@@ -66,8 +58,17 @@ router.post('/', async (req, res) => {
       });
     }
     
+    // Vérifier si le code existe déjà
+    const existingType = await RequestType.findOne({ code: code.toUpperCase() });
+    if (existingType) {
+      return res.status(409).json({
+        success: false,
+        message: 'Un type de demande avec ce code existe déjà'
+      });
+    }
+
     const requestType = new RequestType({
-      code,
+      code: code.toUpperCase(),
       name,
       description,
       priority,

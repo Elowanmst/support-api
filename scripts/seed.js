@@ -4,87 +4,71 @@ const RequestType = require('../src/models/RequestType');
 
 const seedData = [
   {
-    code: 'TECH_ISSUE',
-    name: 'Problème technique',
-    description: 'Problèmes liés au fonctionnement technique de l\'application ou du service',
-    priority: 'high',
+    code: 'BUG_REPORT',
+    name: 'Bug Report',
+    description: 'Signaler un dysfonctionnement dans le système',
     category: 'Technique',
-    estimatedResponseTime: 4,
-    isActive: true
-  },
-  {
-    code: 'BILLING_QUESTION',
-    name: 'Question de facturation',
-    description: 'Questions relatives aux factures, paiements et abonnements',
-    priority: 'medium',
-    category: 'Finance',
-    estimatedResponseTime: 24,
-    isActive: true
-  },
-  {
-    code: 'ACCOUNT_MODIFICATION',
-    name: 'Demande de modification de compte',
-    description: 'Demandes de modification des informations de profil ou paramètres du compte',
-    priority: 'medium',
-    category: 'Compte',
-    estimatedResponseTime: 8,
-    isActive: true
+    priority: 'high',
+    estimatedResponseTime: 24
   },
   {
     code: 'FEATURE_REQUEST',
     name: 'Demande de fonctionnalité',
-    description: 'Suggestions d\'amélioration ou demandes de nouvelles fonctionnalités',
-    priority: 'low',
-    category: 'Développement',
-    estimatedResponseTime: 72,
-    isActive: true
+    description: 'Proposer une nouvelle fonctionnalité',
+    category: 'Évolution',
+    priority: 'medium',
+    estimatedResponseTime: 72
   },
   {
-    code: 'COMPLAINT',
-    name: 'Réclamation',
-    description: 'Réclamations concernant le service ou l\'expérience utilisateur',
-    priority: 'critical',
-    category: 'Service Client',
-    estimatedResponseTime: 2,
-    isActive: true
+    code: 'SUPPORT',
+    name: 'Support technique',
+    description: 'Aide et assistance technique',
+    category: 'Support',
+    priority: 'medium',
+    estimatedResponseTime: 12
+  },
+  {
+    code: 'ACCOUNT_ISSUE',
+    name: 'Problème de compte',
+    description: 'Questions relatives aux comptes utilisateurs',
+    category: 'Compte',
+    priority: 'high',
+    estimatedResponseTime: 6
+  },
+  {
+    code: 'GENERAL_INQUIRY',
+    name: 'Question générale',
+    description: 'Questions générales et informations',
+    category: 'Général',
+    priority: 'low',
+    estimatedResponseTime: 48
   }
 ];
 
-async function seedDatabase() {
+const seedDatabase = async () => {
   try {
-    console.log('🔌 Connexion à MongoDB...');
+
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
     await mongoose.connect(mongoURI);
-    console.log('✅ Connexion réussie à MongoDB');
+    
+    console.log('Connected to MongoDB for seeding...');
+    
+    // Nettoyer et réinsérer les données
 
-    console.log('🗑️  Suppression des données existantes...');
     await RequestType.deleteMany({});
-    console.log('✅ Données existantes supprimées');
-
-    console.log('🌱 Insertion des données initiales...');
-    const insertedData = await RequestType.insertMany(seedData);
-    console.log(`✅ ${insertedData.length} types de demande créés avec succès`);
-
-    // Affichage des données créées
-    console.log('\n📋 Types de demande créés :');
-    insertedData.forEach((item, index) => {
-      console.log(`${index + 1}. ${item.code} - ${item.name} (${item.priority})`);
-    });
-
-    console.log('\n🎉 Seeding terminé avec succès !');
-  } catch (error) {
-    console.error('❌ Erreur lors du seeding :', error.message);
-    process.exit(1);
-  } finally {
-    await mongoose.connection.close();
-    console.log('🔌 Connexion MongoDB fermée');
+    const inserted = await RequestType.insertMany(seedData);
+    
+    console.log(`Database seeded successfully! Inserted ${inserted.length} RequestTypes.`);
     process.exit(0);
+  } catch (error) {
+    console.error('Seeding error:', error);
+    process.exit(1);
   }
-}
+};
 
-// Exécution du script si lancé directement
+// Exécuter uniquement si le fichier est appelé directement
 if (require.main === module) {
   seedDatabase();
 }
 
-module.exports = { seedDatabase, seedData };
+module.exports = { seedData, seedDatabase };
