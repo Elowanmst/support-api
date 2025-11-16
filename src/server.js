@@ -1,4 +1,16 @@
 
+const express = require('express');
+require('dotenv').config();
+const connectDB = require('./config/database');
+const requestTypesRoutes = require('./routes/requestTypes');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use((err, req, res, next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.error('Error:', err.stack);
@@ -11,11 +23,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Démarrage du serveur
 const server = app.listen(PORT, () => {
-  console.log(` Serveur démarré sur le port ${PORT}`);
-  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(` Health check: http://localhost:${PORT}/health`);
-  console.log(` API endpoints: http://localhost:${PORT}/api/request-types`);
+  console.log(`Serveur démarré sur le port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`API endpoints: http://localhost:${PORT}/api/request-types`);
 });
 
 

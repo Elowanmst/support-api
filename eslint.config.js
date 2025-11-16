@@ -1,0 +1,35 @@
+export default [
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: 'commonjs',
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        exports: 'writable',
+        global: 'readonly',
+        module: 'writable',
+        require: 'readonly',
+        jest: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly'
+      }
+    },
+    rules: {
+      'no-console': 'off',
+      'no-unused-vars': 'warn',
+      'no-undef': 'error',
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single']
+    }
+  }
+];
