@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS middleware (pour les requêtes cross-origin si nécessaire)
+// CORS middleware
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -23,14 +23,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware de logging des requêtes
+// Middleware de logging (désactivé en mode test)
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  }
   next();
 });
 
-// Connexion à la base de données
-connectDB();
+// Connexion à la base de données (seulement si pas en mode test)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // Routes
 app.use('/api/request-types', requestTypesRoutes);
@@ -67,7 +71,9 @@ app.use('*', (req, res) => {
 
 // Middleware global de gestion d'erreurs
 app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Error:', err.stack);
+  }
   
   res.status(err.status || 500).json({
     success: false,
@@ -76,29 +82,31 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Démarrage du serveur
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-  console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
-});
-
-// Gestion de l'arrêt gracieux
-process.on('SIGTERM', () => {
-  console.log('SIGTERM reçu, arrêt gracieux...');
-  server.close(() => {
-    console.log('Serveur fermé');
-    process.exit(0);
+// Démarrage du serveur (seulement si pas en mode test)
+if (process.env.NODE_ENV !== 'test') {
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
   });
-});
 
-process.on('SIGINT', () => {
-  console.log('SIGINT reçu, arrêt gracieux...');
-  server.close(() => {
-    console.log('Serveur fermé');
-    process.exit(0);
+  // Gestion de l'arrêt gracieux
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM reçu, arrêt gracieux...');
+    server.close(() => {
+      console.log('Serveur fermé');
+      process.exit(0);
+    });
   });
-});
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT reçu, arrêt gracieux...');
+    server.close(() => {
+      console.log('Serveur fermé');
+      process.exit(0);
+    });
+  });
+}
 
 module.exports = app;
