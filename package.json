@@ -1,0 +1,33 @@
+{
+  "name": "support-api",
+  "version": "1.0.0",
+  "description": "API REST pour un système de support client avec MongoDB",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/ scripts/ tests/ --ext .js",
+    "lint:fix": "eslint src/ scripts/ tests/ --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\""
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-node": "^11.1.0",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^10.3.0",
+    "nodemon": "^3.1.11",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.6.2",
+    "supertest": "^7.1.4"
+  }
+}
