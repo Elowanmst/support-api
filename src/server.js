@@ -10,7 +10,11 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
+
 // CORS middleware
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -23,7 +27,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware de logging (désactivé en mode test)
+
+
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -31,10 +36,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Connexion à la base de données (seulement si pas en mode test)
-if (process.env.NODE_ENV !== 'test') {
-  connectDB();
-}
+
+// Connexion à la base de données
+connectDB();
+
 
 // Routes
 app.use('/api/request-types', requestTypesRoutes);
@@ -71,9 +76,13 @@ app.use('*', (req, res) => {
 
 // Middleware global de gestion d'erreurs
 app.use((err, req, res, next) => {
+
+feature/ci-cd-setup
   if (process.env.NODE_ENV !== 'test') {
     console.error('Error:', err.stack);
   }
+
+
   
   res.status(err.status || 500).json({
     success: false,
@@ -82,14 +91,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Démarrage du serveur (seulement si pas en mode test)
-if (process.env.NODE_ENV !== 'test') {
-  const server = app.listen(PORT, () => {
-    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-    console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
-  });
+
+
+// Démarrage du serveur
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
+});
+
 
   // Gestion de l'arrêt gracieux
   process.on('SIGTERM', () => {
@@ -108,5 +119,6 @@ if (process.env.NODE_ENV !== 'test') {
     });
   });
 }
+
 
 module.exports = app;

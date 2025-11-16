@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const requestTypeSchema = new mongoose.Schema({
   code: {
     type: String,
+
     required: [true, 'Code is required'],
     unique: true,
     uppercase: true,
@@ -24,10 +25,12 @@ const requestTypeSchema = new mongoose.Schema({
       values: ['low', 'medium', 'high', 'critical'],
       message: 'Priority must be one of: low, medium, high, critical'
     },
+
     default: 'medium'
   },
   category: {
     type: String,
+
     required: [true, 'Category is required'],
     trim: true
   },
@@ -35,12 +38,14 @@ const requestTypeSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Estimated response time is required'],
     min: [1, 'Estimated response time must be at least 1 hour']
+
   },
   isActive: {
     type: Boolean,
     default: true
   }
 }, {
+
   timestamps: true, // Ajoute automatiquement createdAt et updatedAt
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
@@ -64,3 +69,4 @@ requestTypeSchema.methods.toggleActive = function() {
 const RequestType = mongoose.model('RequestType', requestTypeSchema);
 
 module.exports = RequestType;
+

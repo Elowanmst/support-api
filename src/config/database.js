@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
+
     const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api');
     
     console.log(`MongoDB Connected: ${conn.connection.host}`);
@@ -21,8 +22,10 @@ const connectDB = async () => {
     
   } catch (error) {
     console.error('Error connecting to MongoDB:', error.message);
+
     process.exit(1);
   }
 };
 
+feature/ci-cd-setup
 module.exports = connectDB;

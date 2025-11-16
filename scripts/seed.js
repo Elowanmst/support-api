@@ -47,12 +47,14 @@ const seedData = [
 
 const seedDatabase = async () => {
   try {
+
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/support_api';
     await mongoose.connect(mongoURI);
     
     console.log('Connected to MongoDB for seeding...');
     
     // Nettoyer et réinsérer les données
+
     await RequestType.deleteMany({});
     const inserted = await RequestType.insertMany(seedData);
     
