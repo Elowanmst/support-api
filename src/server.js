@@ -6,11 +6,6 @@ const requestTypesRoutes = require('./routes/requestTypes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connexion à la base de données seulement si pas en test
-if (process.env.NODE_ENV !== 'test') {
-  connectDB();
-}
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,7 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware de logging
+// Middleware de logging (désactivé en mode test)
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -36,27 +31,81 @@ app.use((req, res, next) => {
   next();
 });
 
+// Connexion à la base de données (seulement si pas en mode test)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
+
 // Routes
 app.use('/api/request-types', requestTypesRoutes);
 
-// Health check
+// GET /health - Health check
 app.get('/health', (req, res) => {
-  res.json({ 
+  res.status(200).json({ 
     status: 'ok',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// Gestion d'erreurs
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+// Route de base
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Support API - Système de Support Client',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      requestTypes: '/api/request-types'
+    }
+  });
 });
 
-// Démarrer le serveur seulement si pas en test
+// Middleware pour les routes non trouvées
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route non trouvée'
+  });
+});
+
+// Middleware global de gestion d'erreurs
+app.use((err, req, res, next) => {
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Error:', err.stack);
+  }
+  
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Erreur interne du serveur',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
+
+// Démarrage du serveur (seulement si pas en mode test)
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`📋 API endpoints: http://localhost:${PORT}/api/request-types`);
+  });
+
+  // Gestion de l'arrêt gracieux
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM reçu, arrêt gracieux...');
+    server.close(() => {
+      console.log('Serveur fermé');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT reçu, arrêt gracieux...');
+    server.close(() => {
+      console.log('Serveur fermé');
+      process.exit(0);
+    });
   });
 }
 

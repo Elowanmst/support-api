@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const RequestType = require('../models/RequestType');
 
-// GET /api/request-types
+// GET /api/request-types - Liste tous les types actifs
 router.get('/', async (req, res) => {
   try {
     const requestTypes = await RequestType.find({ isActive: true });
@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/request-types/:id
+// GET /api/request-types/:id - Récupère un type par ID
 router.get('/:id', async (req, res) => {
   try {
     const requestType = await RequestType.findById(req.params.id);
@@ -27,7 +27,7 @@ router.get('/:id', async (req, res) => {
     if (!requestType) {
       return res.status(404).json({ 
         success: false,
-        message: 'RequestType non trouvé' 
+        message: 'Type de demande non trouvé' 
       });
     }
     
@@ -43,35 +43,70 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/request-types
+// POST /api/request-types - Crée un nouveau type
 router.post('/', async (req, res) => {
   try {
+    const { code, name, description, priority, category, estimatedResponseTime } = req.body;
+    
+    // Validation des champs requis
+    if (!code || !name || !description || !category || !estimatedResponseTime) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tous les champs requis doivent être fournis',
+        required: ['code', 'name', 'description', 'category', 'estimatedResponseTime']
+      });
+    }
+    
     // Vérifier si le code existe déjà
-    const existingType = await RequestType.findOne({ code: req.body.code });
+    const existingType = await RequestType.findOne({ code: code.toUpperCase() });
     if (existingType) {
       return res.status(409).json({
         success: false,
-        message: `Un RequestType avec le code "${req.body.code}" existe déjà`
+        message: 'Un type de demande avec ce code existe déjà'
       });
     }
 
-    const requestType = new RequestType(req.body);
+    const requestType = new RequestType({
+      code: code.toUpperCase(),
+      name,
+      description,
+      priority,
+      category,
+      estimatedResponseTime
+    });
+    
     const savedRequestType = await requestType.save();
     
     res.status(201).json({
       success: true,
+      message: 'Type de demande créé avec succès',
       data: savedRequestType
     });
   } catch (error) {
+    console.error('Error creating request type:', error);
+    
+    // Gestion des erreurs de validation MongoDB
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ 
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
         success: false,
-        message: error.message 
+        message: 'Erreur de validation',
+        errors: messages
       });
     }
-    res.status(500).json({ 
+    
+    // Gestion des erreurs de duplication
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: 'Un type de demande avec ce code existe déjà'
+      });
+    }
+    
+    res.status(500).json({
       success: false,
-      message: error.message 
+      message: 'Erreur lors de la création du type de demande',
+      error: error.message
     });
   }
 });
